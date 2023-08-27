@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <iostream>
+#include <cmath>
 
 template <typename T>
 class Vec2
@@ -69,14 +70,37 @@ public:
     void setY(T y) { this->y = y; }
 
     // Methods
-    // Vec2&   Normalize() const;
-    // Vec2    Rotate(const T angle) const;
-    // Vec2    UnitVector() const;
-    // Vec2    Normal() const;
-    // T       Dot(const Vec2<T>& other) const;
-    // T       Magnitude() const;
-    // T       MagnitudeSquared() const;
-    // T       Cross(const Vec2<T>& other) const;
+    T       Magnitude() const { return sqrt(x * x + y * y); }
+    T       MagnitudeSquared() const { return x * x + y * y; }
+
+    Vec2   UnitVector() const {
+        T mag = Magnitude();
+        if (mag == T())
+            throw std::runtime_error("Error : Divide by zero");
+        return Vec2<T>(x / mag, y / mag);
+    }
+
+    Vec2&    Normalize()  {
+        T mag = Magnitude();
+        if (mag == T())
+            throw std::runtime_error("Error : Divide by zero");
+        x /= mag; y /= mag;
+        return *this;
+    }
+
+    Vec2    Rotate(const T angle) const
+    {
+        T rad = angle * M_PI / 180;
+        T cos = std::cos(rad);
+        T sin = std::sin(rad);
+        return Vec2<T>(x * cos - y * sin, x * sin + y * cos);
+    }
+
+    Vec2<T> LeftNormal() const { return Vec2<T>(-y, x); }
+    Vec2<T> RightNormal() const { return Vec2<T>(y, -x); }
+
+    T       Dot(const Vec2<T>& other) const { return x * other.x + y * other.y; }
+    T       Cross(const Vec2<T>& other) const { return x * other.y - y * other.x; }
 };
 
 template <typename T>
